@@ -8,14 +8,14 @@
 
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
   var version = grunt.file.readJSON('./package.json').version;
   var projectPkg = grunt.file.readJSON('package.json');
   var spawn = require('child_process').spawn;
   var _ = require('underscore');
 
-  grunt.registerMultiTask('cucumberjs', 'Run cucumber.js features', function() {
+  grunt.registerMultiTask('cucumberjs', 'Run cucumber.js features', function () {
     var done = this.async();
 
     var options = this.options({
@@ -28,8 +28,10 @@ module.exports = function(grunt) {
 
     // resolve options set via cli
     for (var key in options) {
-      if (grunt.option(key)) {
-        options[key] = grunt.option(key);
+      if (options.hasOwnProperty(key)) {
+        if (grunt.option(key)) {
+          options[key] = grunt.option(key);
+        }
       }
     }
 
@@ -52,8 +54,8 @@ module.exports = function(grunt) {
     if (grunt.option('features')) {
       commands.push(grunt.option('features'));
     } else {
-      this.files.forEach(function(f) {
-        f.src.forEach(function(filepath) {
+      this.files.forEach(function (f) {
+        f.src.forEach(function (filepath) {
           if (!grunt.file.exists(filepath)) {
             grunt.log.warn('Source file "' + filepath + '" not found.');
             return;
@@ -64,11 +66,11 @@ module.exports = function(grunt) {
       });
     }
 
-    var buffer  = [];
+    var buffer = [];
     var cucumber = spawn('./node_modules/.bin/cucumber-js', commands);
 
-    cucumber.stdout.on('data', function(data) {
-      if (options.format === 'html') {
+    cucumber.stdout.on('data', function (data) {
+      if (options.format === 'html' || options.format === 'json') {
         buffer.push(data);
       } else {
         grunt.log.write(data);
@@ -81,27 +83,26 @@ module.exports = function(grunt) {
     });
 
     cucumber.on('close', function (code) {
-      if (options.format === 'html') {
-        var featureJsonOutput;
 
-        var output = Buffer.concat(buffer).toString();
+      var featureJsonOutput;
 
-        var featureStartIndex = output.substring(0, output.indexOf('"keyword": "Feature"')).lastIndexOf('[');
+      var output = Buffer.concat(buffer).toString();
 
-        var logOutput = output.substring(0, featureStartIndex - 1);
+      var featureStartIndex = output.substring(0, output.indexOf('"keyword": "Feature"')).lastIndexOf('[');
 
-        var featureOutput = output.substring(featureStartIndex);
+      var logOutput = output.substring(0, featureStartIndex - 1);
 
-        try {
-          featureJsonOutput = JSON.parse(featureOutput);
-        } catch (e) {
-          grunt.log.error('Unable to parse cucumberjs output into json.');
+      var featureOutput = output.substring(featureStartIndex);
 
-          return done(false);
-        }
+      try {
+        featureJsonOutput = JSON.parse(featureOutput);
+      } catch (e) {
+        grunt.log.error('Unable to parse cucumberjs output into json.');
 
-        generateReport(featureJsonOutput, logOutput);
+        return done(false);
       }
+
+      generateReport(featureJsonOutput, logOutput, options.format);
 
       if (code !== 0) {
         grunt.log.error('failed tests, please see the output');
@@ -117,34 +118,60 @@ module.exports = function(grunt) {
      *
      * @param {object} suite The test suite object
      */
-    var setStats = function(suite) {
+    var setStats = function (suite) {
       var features = suite.features;
 
-      features.forEach(function(feature) {
+      features.forEach(function (feature) {
         feature.passed = 0;
         feature.failed = 0;
 
-        if(!feature.elements) return;
+        if (!feature.elements) {
+          return;
+        }
 
-        feature.elements.forEach(function(element) {
+        //remove Background from reports: https://github.com/mavdi/grunt-cucumberjs/issues/10
+        for (var i = feature.elements.length - 1; i >= 0; i--) {
+          if (feature.elements[i].type === 'background') {
+            feature.elements.splice(i, 1);
+          }
+        }
+
+        feature.elements.forEach(function (element) {
           element.passed = 0;
           element.failed = 0;
           element.notdefined = 0;
           element.skipped = 0;
 
-          element.steps.forEach(function(step) {
-            if(step.result.status === 'passed') return element.passed++;
-            if(step.result.status === 'failed') return element.failed++;
-            if(step.result.status === 'undefined') return element.notdefined++;
+          if (feature.tags) {
+            element.featureTags = [];
+            feature.tags.forEach(function (tag) {
+              element.featureTags.push(tag);
+            });
+          }
 
-            element.skipped ++;
+          element.steps.forEach(function (step) {
+            if (step.result.status === 'passed') {
+              return element.passed++;
+            }
+            if (step.result.status === 'failed') {
+              return element.failed++;
+            }
+            if (step.result.status === 'undefined') {
+              return element.notdefined++;
+            }
+
+            element.skipped++;
           });
 
-          if(element.failed > 0) return feature.failed++;
+          if (element.failed > 0) {
+            return feature.failed++;
+          }
           feature.passed++;
         });
 
-        if(feature.failed > 0) return suite.failed++;
+        if (feature.failed > 0) {
+          return suite.failed++;
+        }
         suite.passed++;
       });
 
@@ -158,8 +185,8 @@ module.exports = function(grunt) {
      *
      * @param {string} name The template name
      */
-    var getPath = function(name) {
-      var path = 'node_modules/grunt-cucumberjs/templates/' + options.theme + '/' + name;
+    var getPath = function (name) {
+      var path = require('path').resolve(__dirname, '../templates') + '/' + options.theme + '/' + name;
 
       // return the users custom template if it has been defined
       if (grunt.file.exists(options.templateDir + '/' + name)) {
@@ -175,9 +202,10 @@ module.exports = function(grunt) {
      * @param {object} featureOutput Features result object
      * @param {string} logOutput Contains any console statements captured during the test run
      */
-    var generateReport = function(featureOutput, logOutput) {
+    var generateReport = function (featureOutput, logOutput, format) {
       var suite = {
         name: projectPkg.name,
+        date: new Date(),
         features: featureOutput,
         passed: 0,
         failed: 0,
@@ -186,19 +214,24 @@ module.exports = function(grunt) {
 
       suite = setStats(suite);
 
-      grunt.file.write(
-        options.output,
-        _.template(grunt.file.read(getPath('index.tmpl')))({
-          suite: suite,
-          version: version,
-          time: new Date(),
-          features: _.template(grunt.file.read(getPath('features.tmpl')))({suite : suite, _ : _ }),
-          styles: grunt.file.read(getPath('style.css')),
-          script: grunt.file.read(getPath('script.js'))
-        })
-      );
+      if (format === 'html') {
+        grunt.file.write(
+          options.output,
+          _.template(grunt.file.read(getPath('index.tmpl')))({
+            suite: suite,
+            version: version,
+            time: new Date(),
+            features: _.template(grunt.file.read(getPath('features.tmpl')))({suite: suite, _: _ }),
+            styles: grunt.file.read(getPath('style.css')),
+            script: grunt.file.read(getPath('script.js'))
+          })
+        );
 
-      grunt.log.writeln('Generated ' + options.output + ' successfully.');
+        grunt.log.writeln('Generated ' + options.output + ' successfully.');
+      } else if (format === 'json') {
+        grunt.file.write(options.output, JSON.stringify(suite));
+      }
+
     };
   });
 };
