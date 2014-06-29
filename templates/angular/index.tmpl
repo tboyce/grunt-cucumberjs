@@ -31,7 +31,7 @@
                 <span class="label tag"
                       ng-class="{'label-info': tag[0] != '~', 'label-danger': tag[0] == '~'}"
                       ng-repeat="tag in suite.tags">
-                    {{ tag }}
+                    {{ tag.replace(',',' or ').replace('~', 'not ') }}
                 </span>
             </div>
         </div>

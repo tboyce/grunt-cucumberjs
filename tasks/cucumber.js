@@ -41,9 +41,24 @@ module.exports = function (grunt) {
       commands.push('-r', options.steps);
     }
 
-    if (options.tags) {
-      commands.push('-t', options.tags);
-    }
+    // quick and dirty support for multiple tag arguments
+    var tagsOption = false;
+    options.tags = [];
+    process.argv.forEach(function (val) {
+      if (val === '-t' || val === '--tags')
+      {
+        tagsOption = true;
+      } else {
+        if (tagsOption) {
+          options.tags.push(val);
+          tagsOption = false;
+        }
+      }
+    });
+
+    options.tags.forEach(function(tag) {
+      commands.push('-t', tag);
+    });
 
     if (options.format === 'html') {
       commands.push('-f', 'json');
@@ -215,7 +230,7 @@ module.exports = function (grunt) {
         passed: 0,
         failed: 0,
         logOutput: logOutput,
-        tags: options.tags.split(',').filter(function(e) { return e;})
+        tags: options.tags
       };
 
       suite = setStats(suite);
