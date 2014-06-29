@@ -5,7 +5,7 @@
     <link data-require="bootstrap-css@3.1.1" data-semver="3.1.1" rel="stylesheet"
           href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
     <style type="text/css">
-      <%= styles %>
+        <%= styles %>
     </style>
 </head>
 
@@ -14,6 +14,7 @@
     <div class="container">
         <div class="navbar-header">
             <a class="navbar-brand" href="#">Cucumberjs Report</a>
+
             <div class="project-name visible-md visible-lg">{{ suite.name }}</div>
             <div class="label-container">
                 <span class="label label-success">Passed: {{ suite.passed }}</span>
@@ -24,30 +25,41 @@
 </div>
 
 <div class="container">
-<div class="text-right generated-on">{{ suite.date }}</div>
+    <div class="row">
+        <div class="col-md-9">
+            <div ng-hide="suite.tags.length == 0">Selected Tags:
+                <span class="label tag"
+                      ng-class="{'label-info': tag[0] != '~', 'label-danger': tag[0] == '~'}"
+                      ng-repeat="tag in suite.tags">
+                    {{ tag }}
+                </span>
+            </div>
+        </div>
+        <div class="col-md-3 text-right generated-on">{{ suite.date }}</div>
+    </div>
 
-    <p>
-        <div class="input-group">
+    <div class="row">
+        <div class="input-group col-md-offset-4 col-md-4 search">
             <input type="text" class="form-control" placeholder="Search" ng-model="search.$"/>
             <div class="input-group-btn">
                 <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
             </div>
         </div>
-    </p>
+    </div>
 
     <div class="row">
 
-        <div class="col-lg-12 col-md-12">
-            <div ng-repeat="feature in suite.features" ng-hide="scenarios.length == 0">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" href="#collapseFeature{{$index}}">
-                                <i class="glyphicon glyphicon-chevron-right"></i>
-                                <i class="glyphicon glyphicon-chevron-down"></i>
-                                <b>{{ feature.keyword }}:</b>{{ feature.name }}
-                                <span class="tag-container">
-                                    <span class="label label-info tag" ng-repeat="tag in feature.tags">{{ tag.name }}</span>
+        <div ng-repeat="feature in suite.features" ng-hide="scenarios.length == 0">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#collapseFeature{{$index}}">
+                            <i class="glyphicon glyphicon-chevron-right"></i>
+                            <i class="glyphicon glyphicon-chevron-down"></i>
+                            <b>{{ feature.keyword }}:</b>{{ feature.name }}
+                            <span class="tag-container">
+                                    <span class="label label-info tag"
+                                          ng-repeat="tag in feature.tags">{{ tag.name }}</span>
                                 </span>
                                 <span class="label-container">
                                     <span status-label="feature" status="passed"></span>
@@ -55,22 +67,23 @@
                                     <span status-label="feature" status="notdefined"></span>
                                     <span status-label="feature" status="skipped"></span>
                                 </span>
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapseFeature{{$index}}" class="panel-collapse collapse">
-                        <div class="panel-body">
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseFeature{{$index}}" class="panel-collapse collapse">
+                    <div class="panel-body">
 
-                            <div ng-repeat="scenario in scenarios = (feature.elements | filter: {type: 'scenario'} | filter:search:strict ) "
-                                 class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <a data-toggle="collapse" href="#collapseScenario{{$parent.$index}}{{$index}}">
-                                            <i class="glyphicon glyphicon-chevron-right"></i>
-                                            <i class="glyphicon glyphicon-chevron-down"></i>
-                                            <b>{{ scenario.keyword }}:</b>{{ scenario.name }}
-                                            <span class="tag-container">
-                                                <span class="label label-info tag" ng-repeat="tag in scenario.tags">{{ tag.name }}</span>
+                        <div ng-repeat="scenario in scenarios = (feature.elements | filter: {type: 'scenario'} | filter:search:strict ) "
+                             class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" href="#collapseScenario{{$parent.$index}}{{$index}}">
+                                        <i class="glyphicon glyphicon-chevron-right"></i>
+                                        <i class="glyphicon glyphicon-chevron-down"></i>
+                                        <b>{{ scenario.keyword }}:</b>{{ scenario.name }}
+                                        <span class="tag-container">
+                                                <span class="label label-info tag"
+                                                      ng-repeat="tag in scenario.tags">{{ tag.name }}</span>
                                             </span>
                                             <span class="label-container">
                                                 <span status-label="scenario" status="passed"></span>
@@ -78,25 +91,24 @@
                                                 <span status-label="scenario" status="notdefined"></span>
                                                 <span status-label="scenario" status="skipped"></span>
                                             </span>
-                                        </a>
-                                    </h4>
-                                </div>
-                                <div id="collapseScenario{{$parent.$index}}{{$index}}" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        <p class="scenario-container" ng-repeat="step in scenario.steps"
-                                           ng-init="this[step.result.status] = true">
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseScenario{{$parent.$index}}{{$index}}" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <p class="scenario-container" ng-repeat="step in scenario.steps"
+                                       ng-init="this[step.result.status] = true">
                                             <span class="label"
                                                   ng-class="{'label-success': passed, 'label-danger': failed, 'label-warning': skipped, 'label-primary': this.undefined }"
                                                   title="{{step.result.status}}">
                                                 <i class="glyphicon"
-                                                        ng-class="{'glyphicon-ok': passed, 'glyphicon-remove': failed, 'glyphicon-minus': skipped, 'glyphicon-flash': this.undefined}"></i>
+                                                   ng-class="{'glyphicon-ok': passed, 'glyphicon-remove': failed, 'glyphicon-minus': skipped, 'glyphicon-flash': this.undefined}"></i>
                                             </span>
                                             <span class="text">
                                                 <span class="keyword highlight">{{step.keyword}}</span>
                                                 {{step.name}}
                                             </span>
-                                        </p>
-                                    </div>
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -114,7 +126,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('.collapse').on('hide.bs.collapse', function (e) {
             e.stopPropagation();
             $(this).prev().removeClass('open');
@@ -133,7 +145,7 @@
 </script>
 
 <script>
-      <%= script %>
+    <%= script %>
 </script>
 
 <script>

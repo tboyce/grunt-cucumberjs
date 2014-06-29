@@ -69,3 +69,11 @@
     position: relative;
     top: -3px;
 }
+
+.panel {
+    margin-bottom: 5px;
+}
+
+.search {
+    margin-bottom: 15px;
+}

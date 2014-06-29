@@ -102,7 +102,7 @@ module.exports = function (grunt) {
         return done(false);
       }
 
-      generateReport(featureJsonOutput, logOutput, options.format);
+      generateReport(featureJsonOutput, logOutput);
 
       if (code !== 0) {
         grunt.log.error('failed tests, please see the output');
@@ -202,19 +202,20 @@ module.exports = function (grunt) {
      * @param {object} featureOutput Features result object
      * @param {string} logOutput Contains any console statements captured during the test run
      */
-    var generateReport = function (featureOutput, logOutput, format) {
+    var generateReport = function (featureOutput, logOutput) {
       var suite = {
         name: projectPkg.name,
         date: new Date(),
         features: featureOutput,
         passed: 0,
         failed: 0,
-        logOutput: logOutput
+        logOutput: logOutput,
+        tags: options.tags.split(',').filter(function(e) { return e;})
       };
 
       suite = setStats(suite);
 
-      if (format === 'html') {
+      if (options.format === 'html') {
         grunt.file.write(
           options.output,
           _.template(grunt.file.read(getPath('index.tmpl')))({
@@ -228,7 +229,7 @@ module.exports = function (grunt) {
         );
 
         grunt.log.writeln('Generated ' + options.output + ' successfully.');
-      } else if (format === 'json') {
+      } else if (options.format === 'json') {
         grunt.file.write(options.output, JSON.stringify(suite));
       }
 

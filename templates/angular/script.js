@@ -13,7 +13,6 @@ app.directive('statusLabel', function() {
       status: '@'
     },
     link: function(scope) {
-      console.log(scope.status);
       if (scope.status === 'passed') {
         scope.class = 'label-success';
       } else if (scope.status === 'failed') {
