@@ -80,7 +80,7 @@ passes the value as ```--tags``` parameter to cucumber.
 #### options.theme
 Type: `String`
 Default: `'foundation'`
-Available: `['foundation', 'bootstrap', 'simple']`
+Available: `['foundation', 'bootstrap', 'simple', 'angular']`
 
 Specifies which theme to use for the html report
 
