@@ -100,7 +100,7 @@
                                     <p class="scenario-container" ng-repeat="step in scenario.steps"
                                        ng-init="this[step.result.status] = true">
                                             <span class="label"
-                                                  ng-class="{'label-success': passed, 'label-danger': failed, 'label-warning': skipped, 'label-primary': this.undefined }"
+                                                  ng-class="{'label-success': passed, 'label-danger': failed, 'label-warning': this.undefined, 'label-primary': skipped }"
                                                   title="{{step.result.status}}">
                                                 <i class="glyphicon"
                                                    ng-class="{'glyphicon-ok': passed, 'glyphicon-remove': failed, 'glyphicon-minus': skipped, 'glyphicon-flash': this.undefined}"></i>
