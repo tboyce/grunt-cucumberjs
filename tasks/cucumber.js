@@ -104,26 +104,28 @@ module.exports = function (grunt) {
 
     cucumber.on('close', function (code) {
 
-      var featureJsonOutput;
-
-      var output = Buffer.concat(buffer).toString();
-
-      var featureStartIndex = output.substring(0, output.indexOf('"keyword": "Feature"')).lastIndexOf('[');
-
-      var logOutput = output.substring(0, featureStartIndex - 1);
-
-      var featureOutput = output.substring(featureStartIndex);
-
-      try {
-        featureJsonOutput = JSON.parse(featureOutput);
-      } catch (e) {
-        grunt.log.error('Unable to parse cucumberjs output into json.');
-
-        return done(false);
+      if (options.format === 'html' || options.format === 'json') {
+        var featureJsonOutput;
+  
+        var output = Buffer.concat(buffer).toString();
+  
+        var featureStartIndex = output.substring(0, output.indexOf('"keyword": "Feature"')).lastIndexOf('[');
+  
+        var logOutput = output.substring(0, featureStartIndex - 1);
+  
+        var featureOutput = output.substring(featureStartIndex);
+  
+        try {
+          featureJsonOutput = JSON.parse(featureOutput);
+        } catch (e) {
+          grunt.log.error('Unable to parse cucumberjs output into json.');
+  
+          return done(false);
+        }
+  
+        generateReport(featureJsonOutput, logOutput);
       }
-
-      generateReport(featureJsonOutput, logOutput);
-
+      
       if (code !== 0) {
         grunt.log.error('failed tests, please see the output');
 
