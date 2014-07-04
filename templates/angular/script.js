@@ -25,3 +25,12 @@ app.directive('statusLabel', function() {
     }
   };
 });
+
+app.directive('duration', function() {
+   return {
+       template: '<small class="text-muted">{{ duration / 1000 / 1000 / 1000 | number:1 }}s</small>',
+       scope: {
+           duration: "="
+       }
+   }
+});

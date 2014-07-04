@@ -146,6 +146,7 @@ module.exports = function (grunt) {
       features.forEach(function (feature) {
         feature.passed = 0;
         feature.failed = 0;
+        feature.duration = 0;
 
         if (!feature.elements) {
           return;
@@ -157,13 +158,14 @@ module.exports = function (grunt) {
             feature.elements.splice(i, 1);
           }
         }
-
+        
         feature.elements.forEach(function (element) {
           element.passed = 0;
           element.failed = 0;
           element.notdefined = 0;
           element.skipped = 0;
-
+          element.duration = 0;
+          
           if (feature.tags) {
             element.featureTags = [];
             feature.tags.forEach(function (tag) {
@@ -172,6 +174,8 @@ module.exports = function (grunt) {
           }
 
           element.steps.forEach(function (step) {
+            element.duration += (step.result.duration || 0);
+            
             if (step.result.status === 'passed') {
               return element.passed++;
             }
@@ -184,6 +188,8 @@ module.exports = function (grunt) {
 
             element.skipped++;
           });
+          
+          feature.duration += element.duration;
 
           if (element.failed > 0) {
             return feature.failed++;
