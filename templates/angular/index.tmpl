@@ -112,8 +112,9 @@
                                                 <span class="keyword highlight">{{step.keyword}}</span>
                                                 {{step.name}}
                                             </span>
+                                            <a ng-show="step.result.error_message" href="#error_{{$parent.$parent.$index}}_{{$parent.$index}}_{{$index}}" data-toggle="collapse">Show Error</a>
                                         </p>
-                                        <div ng-show="step.result.error_message">
+                                        <div class="collapse" id="error_{{$parent.$parent.$index}}_{{$parent.$index}}_{{$index}}">
                                             <label>Error Message</label>
                                             <textarea class="error_message">{{ cleanError(step.result.error_message) }}</textarea>
                                         </div>
