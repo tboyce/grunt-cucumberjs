@@ -115,7 +115,7 @@
                                         </p>
                                         <div ng-show="step.result.error_message">
                                             <label>Error Message</label>
-                                            <textarea class="error_message">{{ step.result.error_message }}</textarea>
+                                            <textarea class="error_message">{{ cleanError(step.result.error_message) }}</textarea>
                                         </div>
                                     </div>
                                 </div>

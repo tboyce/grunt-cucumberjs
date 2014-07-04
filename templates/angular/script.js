@@ -24,6 +24,10 @@ app.controller('MainCtrl', function ($scope, suite, $filter) {
     $scope.pageChanged();
   };
 
+  $scope.cleanError = function(message) {
+    return message.replace(/(.*(node_modules|node\.js|module\.js).*(\n)?)/g, '');
+  };
+
   $scope.itemsPerPage = 10;
   $scope.search();
 
