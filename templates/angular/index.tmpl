@@ -129,7 +129,8 @@
 
     <div class="center">
         <pagination total-items="filteredFeatures.length" items-per-page="itemsPerPage" ng-model="currentPage"
-        ng-change="pageChanged()" max-size="5" boundary-links="true" rotate="false"></pagination>
+        ng-change="pageChanged()" max-size="5" boundary-links="true" rotate="false" num-pages="numPages"
+        ng-show="numPages > 1"></pagination>
     </div>
 
 </div>
