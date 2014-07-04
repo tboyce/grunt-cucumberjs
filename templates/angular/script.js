@@ -34,3 +34,27 @@ app.directive('duration', function() {
        }
    }
 });
+
+var showFeatureOrScenario = function() {
+    return {
+        template: '<b>{{ item.keyword }}:</b>' +
+            '<span data-container="body" data-toggle="popover">' +
+            '{{ item.name }}' +
+            '</span>',
+        link: function(scope, element, attrs) {
+            if (attrs.feature) {
+                scope.item = scope.$eval(attrs.feature);
+            } else if (attrs.scenario) {
+                scope.item = scope.$eval(attrs.scenario);
+            }
+
+            if (scope.item.description) {
+                var content = scope.item.description.replace(/\n/g, "<br />");
+                $(element.find('span')).popover({trigger: 'hover click', placement: 'bottom', content: content, html: true});
+            }
+        }
+    }
+};
+
+app.directive('feature', showFeatureOrScenario);
+app.directive('scenario', showFeatureOrScenario);

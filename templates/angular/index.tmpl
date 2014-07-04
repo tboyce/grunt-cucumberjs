@@ -57,7 +57,7 @@
                         <a data-toggle="collapse" href="#collapseFeature{{$index}}">
                             <i class="glyphicon glyphicon-chevron-right"></i>
                             <i class="glyphicon glyphicon-chevron-down"></i>
-                            <b>{{ feature.keyword }}:</b>{{ feature.name }}
+                            <span feature="feature"></span>
                             <span class="tag-container">
                                     <span class="label label-info tag"
                                           ng-repeat="tag in feature.tags">{{ tag.name }}</span>
@@ -82,7 +82,7 @@
                                     <a data-toggle="collapse" href="#collapseScenario{{$parent.$index}}_{{$index}}">
                                         <i class="glyphicon glyphicon-chevron-right"></i>
                                         <i class="glyphicon glyphicon-chevron-down"></i>
-                                        <b>{{ scenario.keyword }}:</b>{{ scenario.name }}
+                                        <span scenario="scenario"></span>
                                         <span class="tag-container">
                                                 <span class="label label-info tag"
                                                       ng-repeat="tag in scenario.tags">{{ tag.name }}</span>
