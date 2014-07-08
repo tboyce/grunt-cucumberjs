@@ -100,3 +100,7 @@
 .center {
     text-align: center;
 }
+
+.popover {
+    max-width: 100%;
+}
