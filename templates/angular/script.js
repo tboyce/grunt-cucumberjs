@@ -25,6 +25,7 @@ app.controller('MainCtrl', function ($scope, suite, $filter) {
   };
 
   $scope.cleanError = function(message) {
+    if (!message) return '';
     return message.replace(/(.*(node_modules|node\.js|module\.js).*(\n)?)/g, '');
   };
 
