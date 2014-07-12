@@ -25,8 +25,14 @@ app.controller('MainCtrl', function ($scope, suite, $filter) {
   };
 
   $scope.cleanError = function(message) {
-    if (!message) return '';
-    return message.replace(/(.*(node_modules|node\.js|module\.js).*(\n)?)/g, '');
+    if (angular.isObject(message)) {
+      message = message.message;
+    }
+    if (angular.isString(message)) {
+      return message.replace(/(.*(node_modules|node\.js|module\.js).*(\n)?)/g, '');
+    } else {
+      return message;
+    }
   };
 
   $scope.itemsPerPage = 10;
